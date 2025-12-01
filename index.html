@@ -1,130 +1,198 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>小計算機</title>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Pipe Selector (Web)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f5f5f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
+  <body>
+    <div class="app-root">
+      <!-- App Header -->
+      <header class="app-header">
+        <div class="header-main">
+          <div class="header-title">
+            <span class="app-logo">管</span>
+            <div>
+              <div class="app-name">Pipe Selector</div>
+              <div class="app-subtitle">管路系列工具集</div>
+            </div>
+          </div>
+          <button
+            id="themeToggle"
+            class="icon-button"
+            aria-label="切換深色／淺色模式"
+          >
+            🌙
+          </button>
+        </div>
 
-    .app {
-      background: white;
-      padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      width: 320px;
-      max-width: 90vw;
-    }
+        <!-- 分頁 / 工具切換 -->
+        <nav class="tool-nav">
+          <button class="tool-tab active" data-tool-target="quick">
+            風量快查
+          </button>
+          <button class="tool-tab" data-tool-target="flow">風量計算</button>
+          <button class="tool-tab" data-tool-target="rect-round">
+            四角轉圓
+          </button>
+        </nav>
+      </header>
 
-    h1 {
-      font-size: 22px;
-      margin-top: 0;
-      text-align: center;
-    }
+      <!-- App Main -->
+      <main class="app-main">
+        <!-- ==========================
+           例子 3：風量快查表
+           ========================== -->
+        <section class="card tool-section active" data-tool="quick">
+          <h2>風量快查表</h2>
 
-    .row {
-      margin-bottom: 10px;
-    }
+          <!-- 固定風速 -->
+          <div class="row">
+            <label for="quickSpeedInput">固定風速:</label>
+            <input id="quickSpeedInput" type="number" placeholder="例如：13" />
+            <select id="quickSpeedUnit"></select>
+          </div>
 
-    label {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 14px;
-    }
+          <!-- 結果表格：CMM + 兩組推薦管徑 -->
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>CMM</th>
+                  <th>推薦管徑 1 (mm)</th>
+                  <th>管路風量上限 1 (CMM)</th>
+                  <th>效率 1 (%)</th>
+                  <th>推薦管徑 2 (mm)</th>
+                  <th>管路風量上限 2 (CMM)</th>
+                  <th>效率 2 (%)</th>
+                </tr>
+              </thead>
+              <tbody id="quickTableBody">
+                <!-- 由 JS 動態新增列，每列第一欄為輸入 -->
+              </tbody>
+            </table>
+          </div>
 
-    input {
-      width: 100%;
-      padding: 8px 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
+          <!-- 新增列 / 計算按鈕 -->
+          <div class="row">
+            <button id="quickAddRowBtn" type="button">新增風量列</button>
+            <button id="quickCalcBtn" type="button">重新計算</button>
+          </div>
 
-    button {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      background: #007aff;
-      color: white;
-      font-weight: 600;
-      margin-top: 4px;
-    }
+          <div id="quickMessage" class="message"></div>
+        </section>
 
-    button:active {
-      opacity: 0.8;
-    }
+        <!-- ==========================
+           例子 1：風量計算器
+           ========================== -->
+        <section class="card tool-section" data-tool="flow">
+          <h2>風量計算器</h2>
 
-    .result {
-      margin-top: 12px;
-      font-size: 18px;
-      text-align: center;
-      min-height: 24px;
-    }
+          <div class="row">
+            <label for="volumeInput">風量 (逗號或空白分隔):</label>
+            <input
+              id="volumeInput"
+              class="flex-input"
+              placeholder="例如：10, 20, 30"
+            />
+            <span>單位:</span>
+            <select id="volumeUnit"></select>
+          </div>
 
-    .footer {
-      margin-top: 16px;
-      font-size: 12px;
-      text-align: center;
-      color: #666;
-    }
-  </style>
-</head>
-<body>
-  <div class="app">
-    <h1>小計算機</h1>
+          <div class="row">
+            <label for="speedInput">風速:</label>
+            <input
+              id="speedInput"
+              class="flex-input"
+              placeholder="例如：10 (m/s)"
+            />
+            <span>單位:</span>
+            <select id="speedUnit"></select>
+          </div>
 
-    <div class="row">
-      <label for="num1">數字 1</label>
-      <input id="num1" type="number" placeholder="輸入第一個數字" />
+          <div class="row">
+            <button id="calcAreaBtn">計算面積與推薦管徑</button>
+          </div>
+
+          <div id="areaMessage" class="message"></div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>輸入風量</th>
+                  <th>累積風量</th>
+                  <th>風速</th>
+                  <th>推薦管徑</th>
+                  <th>截面積 (需求 / 推薦)</th>
+                </tr>
+              </thead>
+              <tbody id="areaTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ==========================
+           例子 2：四角轉圓
+           ========================== -->
+        <section class="card tool-section" data-tool="rect-round">
+          <h2>四角轉圓</h2>
+
+          <!-- 四角轉圓：矩形 -> 圓管 -->
+          <div class="row">
+            <label for="lengthInput">長度:</label>
+            <input id="lengthInput" type="number" />
+            <select id="lengthUnit"></select>
+          </div>
+
+          <div class="row">
+            <label for="widthInput">寬度:</label>
+            <input id="widthInput" type="number" />
+            <select id="widthUnit"></select>
+          </div>
+
+          <div class="row">
+            <button id="calcDiameterBtn">計算圓管直徑</button>
+          </div>
+
+          <div id="diameterOutput" class="output"></div>
+
+          <hr />
+
+          <!-- 圓轉方：圓管 -> 建議方管尺寸 -->
+          <h3>圓轉方</h3>
+
+          <div class="row">
+            <label for="roundToRectDiameter">圓管直徑 (mm):</label>
+            <input
+              id="roundToRectDiameter"
+              type="number"
+              placeholder="例如：300"
+            />
+            <button id="roundToRectBtn" type="button">產生方管建議</button>
+          </div>
+
+          <div id="roundToRectMessage" class="message"></div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>方管長 (mm)</th>
+                  <th>方管寬 (mm)</th>
+                  <th>方/圓面積比</th>
+                </tr>
+              </thead>
+              <tbody id="roundToRectTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
     </div>
 
-    <div class="row">
-      <label for="num2">數字 2</label>
-      <input id="num2" type="number" placeholder="輸入第二個數字" />
-    </div>
-
-    <button id="addBtn">相加</button>
-
-    <div class="result" id="result"></div>
-
-    <div class="footer">
-      這是部署在 GitHub Pages 的範例網頁<br>
-      （你可以自由修改成自己的工具）
-    </div>
-  </div>
-
-  <script>
-    const num1Input = document.getElementById('num1');
-    const num2Input = document.getElementById('num2');
-    const addBtn = document.getElementById('addBtn');
-    const resultDiv = document.getElementById('result');
-
-    addBtn.addEventListener('click', () => {
-      const a = parseFloat(num1Input.value);
-      const b = parseFloat(num2Input.value);
-
-      if (isNaN(a) || isNaN(b)) {
-        resultDiv.textContent = '請先輸入兩個數字';
-        return;
-      }
-
-      const sum = a + b;
-      resultDiv.textContent = `結果：${sum}`;
-    });
-  </script>
-</body>
+    <script type="module" src="src/main.js"></script>
+  </body>
 </html>

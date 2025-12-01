@@ -1,0 +1,292 @@
+/* ==========================
+   全域 / 佈局
+   ========================== */
+
+:root {
+  --bg: #f5f5f5;
+  --bg-elevated: #ffffff;
+  --border: #d0d0d0;
+  --text: #111111;
+  --accent: #007aff;
+  --accent-soft: rgba(0, 122, 255, 0.1);
+  --danger: #d93025;
+}
+
+body.dark {
+  --bg: #05070a;
+  --bg-elevated: #12141a;
+  --border: #353843;
+  --text: #f5f5f5;
+  --accent: #4da3ff;
+  --accent-soft: rgba(77, 163, 255, 0.16);
+  --danger: #ff6b6b;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.app-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================
+   Header / App 標題列
+   ========================== */
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 12px 16px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--accent);
+}
+
+.app-name {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.app-subtitle {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* 深色模式切換按鈕 */
+.icon-button {
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  padding: 6px 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* ==========================
+   工具分頁 Tab
+   ========================== */
+
+.tool-nav {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 16px 8px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.tool-tab {
+  flex: 1;
+  min-width: 0;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  padding: 6px 8px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.tool-tab.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+/* ==========================
+   內容區 / 卡片
+   ========================== */
+
+.app-main {
+  flex: 1;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 12px 16px 24px;
+}
+
+.card {
+  background: var(--bg-elevated);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border);
+}
+
+/* 只顯示 active 的工具區塊 */
+.tool-section {
+  display: none;
+}
+
+.tool-section.active {
+  display: block;
+}
+
+/* ==========================
+   表單排版
+   ========================== */
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.row label {
+  min-width: 120px;
+  font-size: 14px;
+}
+
+.flex-input {
+  flex: 1;
+}
+
+input,
+select,
+button {
+  font-size: 14px;
+}
+
+input,
+select {
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid var(--accent-soft);
+  outline-offset: 1px;
+}
+
+button {
+  border-radius: 999px;
+  border: none;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button:active {
+  opacity: 0.85;
+}
+
+/* ==========================
+   表格樣式
+   ========================== */
+
+.table-wrapper {
+  margin-top: 8px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th,
+td {
+  border: 1px solid var(--border);
+  padding: 6px 8px;
+  text-align: center;
+}
+
+thead {
+  background: var(--accent-soft);
+}
+
+/* ==========================
+   訊息 / 輸出
+   ========================== */
+
+.message {
+  margin-top: 4px;
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.output {
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+/* ==========================
+   手機優化
+   ========================== */
+
+@media (max-width: 600px) {
+  .row label {
+    min-width: 80px;
+    flex: 0 0 80px;
+  }
+
+  .header-main {
+    padding-inline: 12px;
+  }
+
+  .tool-nav {
+    padding-inline: 12px;
+  }
+
+  .app-main {
+    padding-inline: 12px;
+  }
+}
+
+/* 效率顏色：>90 紅，80~90 綠 */
+
+.eff-high {
+  color: #e53935;
+  font-weight: 600;
+}
+
+.eff-mid {
+  color: #43a047;
+  font-weight: 600;
+}

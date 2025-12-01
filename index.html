@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>小計算機</title>
+
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .app {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 320px;
+      max-width: 90vw;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .row {
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: #007aff;
+      color: white;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    button:active {
+      opacity: 0.8;
+    }
+
+    .result {
+      margin-top: 12px;
+      font-size: 18px;
+      text-align: center;
+      min-height: 24px;
+    }
+
+    .footer {
+      margin-top: 16px;
+      font-size: 12px;
+      text-align: center;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>小計算機</h1>
+
+    <div class="row">
+      <label for="num1">數字 1</label>
+      <input id="num1" type="number" placeholder="輸入第一個數字" />
+    </div>
+
+    <div class="row">
+      <label for="num2">數字 2</label>
+      <input id="num2" type="number" placeholder="輸入第二個數字" />
+    </div>
+
+    <button id="addBtn">相加</button>
+
+    <div class="result" id="result"></div>
+
+    <div class="footer">
+      這是部署在 GitHub Pages 的範例網頁<br>
+      （你可以自由修改成自己的工具）
+    </div>
+  </div>
+
+  <script>
+    const num1Input = document.getElementById('num1');
+    const num2Input = document.getElementById('num2');
+    const addBtn = document.getElementById('addBtn');
+    const resultDiv = document.getElementById('result');
+
+    addBtn.addEventListener('click', () => {
+      const a = parseFloat(num1Input.value);
+      const b = parseFloat(num2Input.value);
+
+      if (isNaN(a) || isNaN(b)) {
+        resultDiv.textContent = '請先輸入兩個數字';
+        return;
+      }
+
+      const sum = a + b;
+      resultDiv.textContent = `結果：${sum}`;
+    });
+  </script>
+</body>
+</html>

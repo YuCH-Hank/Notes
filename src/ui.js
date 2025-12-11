@@ -153,6 +153,7 @@ export function setupUI() {
   const calcAreaBtn = document.getElementById("calcAreaBtn");
   const areaMessage = document.getElementById("areaMessage");
   const areaTableBody = document.getElementById("areaTableBody");
+  speedInput.value = "13";
 
   // 單位選單初始化
   Object.keys(Unit_AirVolume).forEach((u) => {
@@ -312,6 +313,8 @@ export function setupUI() {
   const quickCalcBtn = document.getElementById("quickCalcBtn");
   const quickMessage = document.getElementById("quickMessage");
 
+  quickSpeedInput.value = "13";
+
   // 初始化風速單位
   Object.keys(Unit_AirSpeed).forEach((u) => {
     quickSpeedUnit.add(new Option(u, u, false, u === "m/s"));
@@ -348,8 +351,7 @@ export function setupUI() {
   // 預設先給一列
   addQuickRow();
 
-  // 點「重新計算」→ 根據每列 CMM 重新算（圓管）
-  quickCalcBtn.addEventListener("click", () => {
+  function runQuickCalc() {
     quickMessage.textContent = "";
 
     const speedVal = Number(quickSpeedInput.value);
@@ -434,8 +436,24 @@ export function setupUI() {
     if (!hasValidRow) {
       quickMessage.textContent = "請在至少一列輸入 CMM 數值";
     }
-  });
+  }
 
+  // �I�u���s�p��v�Ϋ� Enter ����p��
+  // Enter �]�|�s�W�@�C�í��s�p��
+  quickCalcBtn.addEventListener("click", runQuickCalc);
+  function handleQuickEnter(evt) {
+    if (evt.key === "Enter") {
+      evt.preventDefault();
+      runQuickCalc();
+      addQuickRow();
+    }
+  }
+  quickSpeedInput.addEventListener("keydown", handleQuickEnter);
+  quickTableBody.addEventListener("keydown", (evt) => {
+    if (evt.target instanceof HTMLInputElement) {
+      handleQuickEnter(evt);
+    }
+  });
   // ==========================
   // ✅ 新的一頁：方管推薦表（依風量 + 風速）
   // ==========================
@@ -447,6 +465,7 @@ export function setupUI() {
   const rectTableCalcBtn = document.getElementById("rectTableCalcBtn");
   const rectTableMessage = document.getElementById("rectTableMessage");
   const rectTableBody = document.getElementById("rectTableBody");
+  rectTableSpeedInput.value = "13";
 
   // 初始化單位選單：風量 / 風速
   Object.keys(Unit_AirVolume).forEach((u) => {

@@ -29,7 +29,8 @@ function parseNumberList(str) {
 
 /** 單位換算 */
 function toUnit(value, unit, unitMap) {
-  return value * (unitMap[unit] ?? 1);
+  const factor = unitMap[unit];
+  return value * (factor !== undefined ? factor : 1);
 }
 
 // 給效率用的樣式設定（快查表＋方管推薦兩邊共用）
@@ -380,7 +381,7 @@ export function setupUI() {
     rows.forEach((tr) => {
       const tds = tr.querySelectorAll("td");
       const input = tds[0].querySelector("input.quick-volume-input");
-      const cmm = Number(input?.value || 0);
+      const cmm = Number(input && input.value ? input.value : 0);
 
       // 清空舊結果
       for (let i = 1; i < tds.length; i++) {

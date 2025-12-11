@@ -341,11 +341,13 @@ export function setupUI() {
     }
 
     quickTableBody.appendChild(tr);
+    return input;
   }
 
   // 點「新增風量列」→ 增加一列輸入
   quickAddRowBtn.addEventListener("click", () => {
-    addQuickRow();
+    const input = addQuickRow();
+    input.focus();
   });
 
   // 預設先給一列
@@ -445,7 +447,8 @@ export function setupUI() {
     if (evt.key === "Enter") {
       evt.preventDefault();
       runQuickCalc();
-      addQuickRow();
+      const input = addQuickRow();
+      input.focus();
     }
   }
   quickSpeedInput.addEventListener("keydown", handleQuickEnter);

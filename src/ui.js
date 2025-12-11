@@ -32,6 +32,18 @@ function toUnit(value, unit, unitMap) {
   return value * (unitMap[unit] ?? 1);
 }
 
+// 給效率用的樣式設定（快查表＋方管推薦兩邊共用）
+function setEfficiencyCell(td, eff) {
+  td.textContent = eff.toFixed(1);
+  td.classList.remove("eff-high", "eff-mid");
+
+  if (eff > 90) {
+    td.classList.add("eff-high"); // 紅色
+  } else if (eff >= 80 && eff <= 90) {
+    td.classList.add("eff-mid"); // 綠色
+  }
+}
+
 // --------------------------
 // 深色模式
 // --------------------------
@@ -79,6 +91,48 @@ function initToolTabs() {
       );
     });
   });
+}
+
+// --------------------------
+// 給矩形用的共用邏輯：由「需求面積」產生一組方管尺寸
+// --------------------------
+/**
+ * 根據需求截面積 areaNeed (m²)，產生一組方管尺寸建議：
+ * - 假設短邊 a = 50, 100, 150...mm
+ * - 計算理論長邊 b = areaNeed / a
+ * - 以 50mm 為單位無條件進位
+ * - 計算方管面積 Af，與需求面積比值 Af / areaNeed
+ * - 只保留比值在 1.0 ~ 1.25 之間（適度略大）
+ */
+function generateRectListForArea(areaNeed, stepMm = 50, maxShortMm = 1600) {
+  const results = [];
+  if (!areaNeed || areaNeed <= 0) return results;
+
+  for (let shortMm = stepMm; shortMm <= maxShortMm; shortMm += stepMm) {
+    const shortM = shortMm / 1000;
+    const longMTheory = areaNeed / shortM; // m
+
+    if (longMTheory <= 0) continue;
+
+    const longMmTheory = longMTheory * 1000;
+    const longMmCeil = Math.ceil(longMmTheory / stepMm) * stepMm;
+    const longM = longMmCeil / 1000;
+
+    const areaRect = shortM * longM;
+    const ratio = areaRect / areaNeed;
+
+    if (ratio >= 1.0 && ratio <= 1.25) {
+      results.push({
+        short: shortMm,
+        long: longMmCeil,
+        areaRect,
+        ratio,
+      });
+    }
+  }
+
+  results.sort((a, b) => a.short - b.short);
+  return results;
 }
 
 // --------------------------
@@ -203,17 +257,7 @@ export function setupUI() {
   const roundToRectMessage = document.getElementById("roundToRectMessage");
   const roundToRectTableBody = document.getElementById("roundToRectTableBody");
 
-  /**
-   * 根據圓管直徑，產生一組方管尺寸建議
-   * 邏輯（參考你給的 Excel "圓轉方"）：
-   * - 先算出圓管截面積 Ac
-   * - 假設一個方管短邊 a（例如 50, 100, 150...mm）
-   * - 計算理論長邊 b = Ac / a
-   * - 將 b 以 50mm 為單位「無條件進位」到最近的 50 倍數
-   * - 算出方管面積 Af = a * b
-   * - 計算面積比 ratio = Af / Ac
-   * - 只保留 ratio 在 1 ~ 1.25 之間（避免方管過大）
-   */
+  // 以「圓管截面積」為需求面積，呼叫共用函式產生方管列表
   function generateRoundToRectList(diameterMm) {
     const results = [];
     if (!diameterMm || diameterMm <= 0) return results;
@@ -221,36 +265,7 @@ export function setupUI() {
     const radiusM = diameterMm / 1000 / 2;
     const areaCircle = Math.PI * radiusM * radiusM;
 
-    const stepMm = 50;
-    const maxShortMm = 1600; // 可依需求調整
-
-    for (let shortMm = stepMm; shortMm <= maxShortMm; shortMm += stepMm) {
-      const shortM = shortMm / 1000;
-      const longMTheory = areaCircle / shortM; // 理論長邊 (m)
-
-      if (longMTheory <= 0) continue;
-
-      // 以 50mm 為單位無條件進位
-      const longMmTheory = longMTheory * 1000;
-      const longMmCeil = Math.ceil(longMmTheory / stepMm) * stepMm;
-      const longM = longMmCeil / 1000;
-
-      const areaRect = shortM * longM;
-      const ratio = areaRect / areaCircle;
-
-      // 只保留比圓管略大的組合，且不要離太多
-      if (ratio >= 1.0 && ratio <= 1.25) {
-        results.push({
-          short: shortMm,
-          long: longMmCeil,
-          ratio,
-        });
-      }
-    }
-
-    // 依短邊由小到大排序
-    results.sort((a, b) => a.short - b.short);
-    return results;
+    return generateRectListForArea(areaCircle);
   }
 
   roundToRectBtn.addEventListener("click", () => {
@@ -287,7 +302,7 @@ export function setupUI() {
   });
 
   // ==========================
-  // 例子 3：風量快查表
+  // 例子 3：風量快查表（圓管）
   // ==========================
 
   const quickSpeedInput = document.getElementById("quickSpeedInput");
@@ -333,21 +348,7 @@ export function setupUI() {
   // 預設先給一列
   addQuickRow();
 
-  // 計算用的 helper：設定效率顏色
-  function setEfficiencyCell(td, eff) {
-    td.textContent = eff.toFixed(1);
-
-    // 清掉舊 class
-    td.classList.remove("eff-high", "eff-mid");
-
-    if (eff > 90) {
-      td.classList.add("eff-high"); // 紅色
-    } else if (eff >= 80 && eff <= 90) {
-      td.classList.add("eff-mid"); // 綠色
-    }
-  }
-
-  // 點「重新計算」→ 根據每列 CMM 重新算
+  // 點「重新計算」→ 根據每列 CMM 重新算（圓管）
   quickCalcBtn.addEventListener("click", () => {
     quickMessage.textContent = "";
 
@@ -433,5 +434,87 @@ export function setupUI() {
     if (!hasValidRow) {
       quickMessage.textContent = "請在至少一列輸入 CMM 數值";
     }
+  });
+
+  // ==========================
+  // ✅ 新的一頁：方管推薦表（依風量 + 風速）
+  // ==========================
+
+  const rectTableVolumeInput = document.getElementById("rectTableVolumeInput");
+  const rectTableVolumeUnit = document.getElementById("rectTableVolumeUnit");
+  const rectTableSpeedInput = document.getElementById("rectTableSpeedInput");
+  const rectTableSpeedUnit = document.getElementById("rectTableSpeedUnit");
+  const rectTableCalcBtn = document.getElementById("rectTableCalcBtn");
+  const rectTableMessage = document.getElementById("rectTableMessage");
+  const rectTableBody = document.getElementById("rectTableBody");
+
+  // 初始化單位選單：風量 / 風速
+  Object.keys(Unit_AirVolume).forEach((u) => {
+    rectTableVolumeUnit.add(new Option(u, u, false, u === "CMM"));
+  });
+  Object.keys(Unit_AirSpeed).forEach((u) => {
+    rectTableSpeedUnit.add(new Option(u, u, false, u === "m/s"));
+  });
+
+  rectTableCalcBtn.addEventListener("click", () => {
+    rectTableMessage.textContent = "";
+    rectTableBody.innerHTML = "";
+
+    const volVal = Number(rectTableVolumeInput.value);
+    const spdVal = Number(rectTableSpeedInput.value);
+
+    if (!volVal) {
+      rectTableMessage.textContent = "請輸入風量";
+      return;
+    }
+    if (!spdVal) {
+      rectTableMessage.textContent = "請輸入風速";
+      return;
+    }
+
+    const volCMM = toUnit(volVal, rectTableVolumeUnit.value, Unit_AirVolume);
+    const speedMps = toUnit(spdVal, rectTableSpeedUnit.value, Unit_AirSpeed);
+
+    if (volCMM <= 0) {
+      rectTableMessage.textContent = "風量需為正數";
+      return;
+    }
+    if (speedMps <= 0) {
+      rectTableMessage.textContent = "風速需為正數";
+      return;
+    }
+
+    // 需求截面積 (m²)
+    const areaNeed = calculateArea(volCMM, speedMps);
+
+    // 基於需求面積產生一組方管尺寸
+    const list = generateRectListForArea(areaNeed);
+    if (!list.length) {
+      rectTableMessage.textContent =
+        "在目前設定下找不到合適的方管組合（面積比超出範圍）";
+      return;
+    }
+
+    list.forEach((item) => {
+      const qMax = item.areaRect * speedMps * 60; // CMM
+      const eff = (volCMM / qMax) * 100;
+
+      const tr = document.createElement("tr");
+      const ratioDisplay = item.ratio.toFixed(3);
+
+      tr.innerHTML = `
+        <td>${item.short}</td>
+        <td>${item.long}</td>
+        <td>${item.areaRect.toFixed(4)}</td>
+        <td>${ratioDisplay}</td>
+        <td>${qMax.toFixed(1)}</td>
+        <td></td>
+      `;
+
+      const effCell = tr.lastElementChild;
+      setEfficiencyCell(effCell, eff);
+
+      rectTableBody.appendChild(tr);
+    });
   });
 }

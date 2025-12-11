@@ -37,6 +37,9 @@
           <button class="tool-tab" data-tool-target="rect-round">
             四角轉圓
           </button>
+          <button class="tool-tab" data-tool-target="rect-table">
+            方管推薦
+          </button>
         </nav>
       </header>
 
@@ -187,6 +190,55 @@
                 </tr>
               </thead>
               <tbody id="roundToRectTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ==========================
+           ✅ 新的一頁：方管推薦（依風量 + 風速）
+           ========================== -->
+        <section class="card tool-section" data-tool="rect-table">
+          <h2>方管推薦表（依風量＋風速）</h2>
+
+          <div class="row">
+            <label for="rectTableVolumeInput">風量:</label>
+            <input
+              id="rectTableVolumeInput"
+              type="number"
+              placeholder="例如：50"
+            />
+            <select id="rectTableVolumeUnit"></select>
+          </div>
+
+          <div class="row">
+            <label for="rectTableSpeedInput">風速:</label>
+            <input
+              id="rectTableSpeedInput"
+              type="number"
+              placeholder="例如：13"
+            />
+            <select id="rectTableSpeedUnit"></select>
+          </div>
+
+          <div class="row">
+            <button id="rectTableCalcBtn" type="button">產生方管建議</button>
+          </div>
+
+          <div id="rectTableMessage" class="message"></div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>短邊 (mm)</th>
+                  <th>長邊 (mm)</th>
+                  <th>方管面積 (m²)</th>
+                  <th>面積比 (方 / 需求)</th>
+                  <th>可通風量 (CMM)</th>
+                  <th>效率 (%)</th>
+                </tr>
+              </thead>
+              <tbody id="rectTableBody"></tbody>
             </table>
           </div>
         </section>
